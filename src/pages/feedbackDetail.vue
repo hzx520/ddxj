@@ -14,7 +14,7 @@
         <!-- <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'order'})">取消</Button>
         <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'order'})">提交</Button> -->
         <ButtonGroup  size="large" style="width: 100%;">
-            <Button style="width:50%;">取消</Button>
+            <Button style="width:50%;" @click="$router.go(-1)">取消</Button>
             <Button type="warning" style="width:50%;">提交</Button>
         </ButtonGroup>
       </div>
@@ -35,11 +35,11 @@ export default {
       msg: '首页',
       text: '',
       phoneNo: '',
-      id: '1'
+      id: ''
     }
   },
   mounted() {
-    // this.id = this.$route.query.id
+    this.id = this.$route.query.id
   },
 }
 </script>

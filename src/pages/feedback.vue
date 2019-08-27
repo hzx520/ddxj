@@ -7,7 +7,7 @@
         <div class="td" style="width: 48%;">反馈状态</div>
       </div>
       <div class="order-body">
-        <div class="order-tr" v-for="(item, index) in list" :key="index" @click="$router.push({path: 'order', query:{id:index}})">
+        <div class="order-tr" v-for="(item, index) in list" :key="index" @click="$router.push({path: 'feedbackDetail', query:{id:index}})">
           <div class="td" style="width: 48%;">
             <div>{{item.time}}</div>
           </div>
@@ -20,7 +20,7 @@
     </div>
     <div v-else class="no-order">暂无意见反馈</div>
     <div class="feedbackBtn">
-      <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'order'})">我要反馈</Button>
+      <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'feedbackDetail'})">我要反馈</Button>
     </div>
   </div>
 </template>
