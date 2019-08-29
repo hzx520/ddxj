@@ -4,12 +4,14 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import iView from 'iview'
+import Axios from 'axios'
 
 import 'iview/dist/styles/iview.css'
 // import 'jquery'
 Vue.use(iView)
 
 Vue.config.productionTip = false
+Vue.prototype.$http = Vue.$http = Axios
 
 /* eslint-disable no-new */
 new Vue({
