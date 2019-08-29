@@ -24,9 +24,9 @@
           <Icon class="grey" type="md-alert"/>
           <span class="huise">点击选择服务周期</span>
       </div>
-      <div class="name">服务周期 （{{startTime}} ~ {{endTime}}）</div>
+      <div class="name" style="padding-bottom:8px;">服务周期 （{{startTime}} ~ {{endTime}}）</div>
       <hr>
-      <div class="tip">
+      <div class="tip" style="padding-top:3px;">
           <Icon class="grey" type="md-alert"/>
           <span class="huise">代丢服务自购买成功后次日生效</span>
       </div>
