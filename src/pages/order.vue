@@ -1,18 +1,22 @@
 <template>
-  <div class="order">
+  <div class="order" id="order">
       <div class="name">联系人</div>
-      <i-input class="input" :value.sync="name" size="large" placeholder="请输入联系人" :disabled="!!id" style="width: 100%;"></i-input>
-      <div class="name mt10">联系方式</div>
-      <i-input class="input" :value.sync="phoneNo" size="large" @on-blur="inputBlur" placeholder="请输入联系方式" :disabled="!!id" style="width: 100%;"></i-input>
-      <div class="name mt10">所在小区</div>
-      <i-select :model.sync="city" size="large" placeholder="请选择所在小区" :disabled="!!id">
+      <i-input class="order_input" :value.sync="name" size="large" placeholder="请输入联系人" :disabled="!!id" style="width: 100%;"></i-input>
+      <hr>
+      <div class="name">联系方式</div>
+      <i-input class="order_input" :value.sync="phoneNo" size="large" @on-blur="inputBlur" placeholder="请输入联系方式" :disabled="!!id" style="width: 100%;"></i-input>
+      <hr>
+      <div class="name">所在小区</div>
+      <i-select class="order_input" :model.sync="city" size="large" placeholder="请选择所在小区" :disabled="!!id">
           <i-option value="beijing">北京</i-option>
           <i-option value="shanghai">上海</i-option>
           <i-option value="hangzhou">杭州</i-option>
       </i-select>
-      <div class="name mt10">详细地址</div>
-      <i-input class="input" :value.sync="address" size="large" @on-blur="inputBlur" placeholder="请输入详细地址" :disabled="!!id" style="width: 100%;"></i-input>
-      <div class="open mt10">
+      <hr>
+      <div class="name">详细地址</div>
+      <i-input class="order_input" :value.sync="address" size="large" @on-blur="inputBlur" placeholder="请输入详细地址" :disabled="!!id" style="width: 100%;"></i-input>
+      <hr>
+      <div class="open">
           <i-switch v-model="open" size="large" @on-change="getTime" style="width:80px;">
               <span slot="open">￥480/年</span>
               <span slot="close">￥50/月</span>
@@ -21,7 +25,8 @@
           <span class="huise">点击选择服务周期</span>
       </div>
       <div class="name">服务周期 （{{startTime}} ~ {{endTime}}）</div>
-      <div class="tip mt10">
+      <hr>
+      <div class="tip">
           <Icon class="grey" type="md-alert"/>
           <span class="huise">代丢服务自购买成功后次日生效</span>
       </div>
@@ -111,7 +116,7 @@ export default {
     authorize() {
       let appId = 'wx1ea6607052b21894';
       // let redirect = 'http%3a%2f%2f10.3.149.90%3a8080%2f%23%2forder';
-      let redirect = 'http%3a%2f%2fwww.cx-tech.co%2fdist%2f%23%2forder';
+      let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2forder';
       let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;      
       // let redirect2 = 'https%3A%2F%2Fchong.qq.com%2Fphp%2Findex.php%3Fd%3D%26c%3DwxAdapter%26m%3DmobileDeal%26showwxpaytitle%3D1%26vb2ctag%3D4_2030_5_1194_60';
       // let url2 = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=123#wechat_redirect`;
@@ -156,12 +161,58 @@ export default {
 }
 </script>
 
+<style lang="scss">
+    // .ivu-switch-checked .ivu-switch-inner {
+    //   width: 70px;
+    // }
+    #order {
+
+
+      .ivu-switch-large.ivu-switch-checked:after {
+            left: 58px;
+        }
+        .ivu-switch {
+            border-color: #FF8000;
+            background-color: #FF8000;
+        }
+        .ivu-btn-warning {
+          border-color: #FF8000;
+          background-color: #FF8000;
+        }
+        
+      .order_input {
+        .ivu-input {
+          border: none;
+          outline: none;
+          padding-top: 0;
+          padding-bottom: 0;
+          &:focus {
+            border: none;
+            box-shadow: none;
+          }
+        }
+        .ivu-select-selection {
+          border: none;
+          box-shadow: none;
+        }
+      }
+
+    }
+  
+</style>
 <style lang="scss" scoped>
     .order {
-      padding: 10px 15px;
+      padding: 5px 15px;
       .name {
-        line-height: 42px;
-        text-indent: 10px;
+        line-height: 32px;
+        text-indent: 15px;
+        padding-top: 5px;
+      }
+      hr {
+        background: #e6e6e6;
+        height: 1px;
+        border: none;
+        margin-bottom: 12px;
       }
       .open {
          padding-top: 10px;
@@ -183,26 +234,7 @@ export default {
         width: 100%;
         text-align: center;
         height: 40px;
-        position: fixed;
-        bottom: 10px;
-        left: 0;
+        margin-top: 20px;
       }
     }
-</style>
-<style lang="scss">
-    // .ivu-switch-checked .ivu-switch-inner {
-    //   width: 70px;
-    // }
-    .ivu-switch-large.ivu-switch-checked:after {
-        left: 58px;
-    }
-    .ivu-switch {
-        border-color: #FF8000;
-        background-color: #FF8000;
-    }
-    .ivu-btn-warning {
-      border-color: #FF8000;
-      background-color: #FF8000;
-    }
-  
 </style>
