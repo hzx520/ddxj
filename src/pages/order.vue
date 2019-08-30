@@ -1,6 +1,6 @@
 <template>
   <div class="order" id="order">
-      <div class="name">联系人</div>
+      <div class="name">联系人2</div>
       <i-input class="order_input" :value.sync="name" size="large" placeholder="请输入联系人" :disabled="!!id" style="width: 100%;"></i-input>
       <hr>
       <div class="name">联系方式</div>
@@ -42,7 +42,7 @@
       <!-- <div>openid:{{openid}} code:{{code}} res:{{res}}</div> -->
       <div>{{openid}}</div>
       <div v-if="!id" class="payBtn">
-        <Button size="large" type="warning" long style="height:40px;width:90%;" @click="authorize">支付</Button>
+        <Button size="large" type="warning" long style="height:40px;width:90%;" @click="submitPay">支付</Button>
       </div>
   </div>
 </template>
@@ -70,22 +70,39 @@ export default {
     }
   },
   created() {
+    console.log(111)
     this.id = this.$route.query.id;
     this.isWXIos = this.isWeiXinAndIos();
+    console.log(112)
     if(this.id) {
+      console.log(113)
       this.queryOrderDetail();
+    }else {
+      console.log(114)
+      this.getTime();
     }
-    this.getTime();
   },
   mounted() {
+    // console.log(211)
+    // this.id = this.$route.query.id;
+    // this.isWXIos = this.isWeiXinAndIos();
+    // console.log(212)
+    // if(this.id) {
+    //   console.log(213)
+    //   this.queryOrderDetail();
+    // }else {
+    //   console.log(214)
+    //   this.getTime();
+    //   this.getCode();
+    // }
   },
   watch:{
-    $route(to,from){
-      console.log(to.path);
-      if(this.getCode()) {
-        this.getOpenid();
-      }
-    }
+    // $route(to,from){
+    //   console.log(to.path);
+    //   if(this.getCode()) {
+    //     this.getOpenid();
+    //   }
+    // }
   },
   methods: {
     inputBlur() {
@@ -113,13 +130,13 @@ export default {
       //   console.log(err)
       // })
     },
+    submitPay() {
+
+    },
     authorize() {
       let appId = 'wx1ea6607052b21894';
-      // let redirect = 'http%3a%2f%2f10.3.149.90%3a8080%2f%23%2forder';
       let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2forder';
-      let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;      
-      // let redirect2 = 'https%3A%2F%2Fchong.qq.com%2Fphp%2Findex.php%3Fd%3D%26c%3DwxAdapter%26m%3DmobileDeal%26showwxpaytitle%3D1%26vb2ctag%3D4_2030_5_1194_60';
-      // let url2 = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=123#wechat_redirect`;
+      let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
       window.location.href = url;
     },
     getCode() {
@@ -134,20 +151,24 @@ export default {
           this.code = arr[i].substr(num+1)
         }
       }
-      return this.code;
-      // this.getOpenid();
+      console.log(this.code)
+      this.getOpenid();
+      // return this.code;
     },
     getOpenid() {
       let appId = 'wx1ea6607052b21894';
       let secret = '9d54f7a93ad9884e404072e8011e73c4';
       let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appId}&secret=${secret}&code=${this.code}&grant_type=authorization_code`;
       this.$http.get(url).then(res => {
+        console.log(3334)
         console.log(res);
         this.openid = res.openid;
         this.res = res;
       }).catch(err => {
         console.log(err)
+        console.log(3335)
       })
+      console.log(3336)
     },
     getTime() {
       this.startTime =  moment().add(1, 'days').format('YYYY-MM-DD');
@@ -166,8 +187,6 @@ export default {
     //   width: 70px;
     // }
     #order {
-
-
       .ivu-switch-large.ivu-switch-checked:after {
             left: 58px;
         }

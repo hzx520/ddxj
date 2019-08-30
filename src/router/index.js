@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/pages/home'
-import Order from '@/pages/order'
-import My from '@/pages/my'
-import MyOrder from '@/pages/myOrder'
-import Feedback from '@/pages/feedback'
-import FeedbackDetail from '@/pages/feedbackDetail'
+import home from '@/pages/home'
+import order from '@/pages/order'
+import my from '@/pages/my'
+import myOrder from '@/pages/myOrder'
+import feedback from '@/pages/feedback'
+import feedbackDetail from '@/pages/feedbackDetail'
 
 Vue.use(Router)
 
@@ -14,32 +14,32 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: home
     },
     {
       path: '/order',
       name: 'order',
-      component: Order
+      component: order
     },
     {
       path: '/my',
       name: 'my',
-      component: My
+      component: my
     },
     {
       path: '/myOrder',
       name: 'myOrder',
-      component: MyOrder
+      component: myOrder
     },
     {
       path: '/feedback',
       name: 'feedback',
-      component: Feedback
+      component: feedback
     },
     {
       path: '/feedbackDetail',
       name: 'feedbackDetail',
-      component: FeedbackDetail
+      component: feedbackDetail
     }
   ]
 })

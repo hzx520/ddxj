@@ -21,6 +21,12 @@ export default {
     return {
       msg: '首页'
     }
+  },
+  created() {
+      let appId = 'wx1ea6607052b21894';
+      let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2forder';
+      let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
+      window.location.href = url;
   }
 }
 </script>

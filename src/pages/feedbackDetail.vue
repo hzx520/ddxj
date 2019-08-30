@@ -29,7 +29,7 @@
 
 <script>
 export default {
-  name: 'home',
+  name: 'feedbackdetail',
   data () {
     return {
       msg: '首页',

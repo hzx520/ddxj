@@ -33,7 +33,7 @@
 
 <script>
 export default {
-  name: 'home',
+  name: 'my',
   data () {
     return {
       modal: false,

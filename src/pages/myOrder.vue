@@ -28,7 +28,7 @@
 
 <script>
 export default {
-  name: 'home',
+  name: 'myorder',
   data () {
     return {
       msg: '首页',
