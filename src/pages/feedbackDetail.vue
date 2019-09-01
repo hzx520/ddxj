@@ -15,7 +15,7 @@
         <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'order'})">提交</Button> -->
         <ButtonGroup  size="large" style="width: 100%;">
             <Button style="width:50%;" @click="$router.go(-1)">取消</Button>
-            <Button type="warning" style="width:50%;">提交</Button>
+            <Button type="warning" style="width:50%;" @click="submit">提交</Button>
         </ButtonGroup>
       </div>
     </div>
@@ -39,7 +39,31 @@ export default {
     }
   },
   mounted() {
-    this.id = this.$route.query.id
+    this.id = this.$route.query.id;
+    if(!this.id) {
+      return;
+    }
+    let params = {
+      id: this.id,
+      openid: 'openid'
+    }
+    this.$http.post(this.$baseUrl + '/api/feedback/query', params).then(res => {
+      this.list = res.data.list || [];
+    }).catch(err => {
+      console.log(err)
+    })
+  },
+  methods: {
+    submit() {
+      let params = {
+        
+      }
+      this.$http.post(this.$baseUrl + '/api/feedback/save', params).then(res => {
+        this.list = res.data.list || [];
+      }).catch(err => {
+        console.log(err)
+      })
+    }
   },
 }
 </script>

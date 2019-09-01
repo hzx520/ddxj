@@ -37,7 +37,20 @@ export default {
   data () {
     return {
       modal: false,
+      info: {
+
+      }
     }
+  },
+  created(){
+    let params = {
+        openid: ''
+    }
+    this.$http.post(this.$baseUrl + '/api/wechat/getUserInfo', params).then(res => {
+      this.info = res.data;
+    }).catch(err => {
+      console.log(err)
+    })
   }
 }
 </script>

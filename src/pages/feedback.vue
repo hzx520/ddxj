@@ -12,7 +12,7 @@
             <div>{{item.time}}</div>
           </div>
           <div class="td" style="width: 48%;">
-            <div v-if="index == 0"class="daifuwu">未处理</div>
+            <div v-if="index == 0" class="daifuwu">未处理</div>
             <div v-if="index" class="fuwuzhong">已处理</div>
           </div>
         </div>
@@ -46,6 +46,18 @@ export default {
         }
       ]
     }
+  },
+  created() {
+    let params = {
+      current: 1,
+      pageSize: 10,
+      openid: 'openid'
+    }
+    this.$http.post(this.$baseUrl + '/api/feedback/queryList', params).then(res => {
+      this.list = res.data.list || [];
+    }).catch(err => {
+      console.log(err)
+    })
   }
 }
 </script>

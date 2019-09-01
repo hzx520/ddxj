@@ -15,7 +15,7 @@
           </div>
           <div class="td" style="width: 24%;">{{item.period}}</div>
           <div class="td" style="width: 24%;">
-            <div v-if="index == 0"class="daifuwu">待服务</div>
+            <div v-if="index == 0" class="daifuwu">待服务</div>
             <div v-if="index == 1" class="fuwuzhong">服务中</div>
             <div v-if="index == 2">已过期</div>
           </div>
@@ -50,6 +50,18 @@ export default {
         }
       ]
     }
+  },
+  created() {
+    let params = {
+      current: 1,
+      pageSize: 10,
+      openid: 'openid'
+    }
+    this.$http.post(this.$baseUrl + '/api/order/queryList', params).then(res => {
+      this.list = res.data.list || [];
+    }).catch(err => {
+      console.log(err)
+    })
   }
 }
 </script>

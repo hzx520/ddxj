@@ -13,6 +13,9 @@ Vue.use(iView)
 Vue.config.productionTip = false
 Vue.prototype.$http = Vue.$http = Axios
 
+let $baseUrl = process.env.NODE_ENV === 'development' ? 'http://www.cx-tech.co:8010' : 'http://172.19.92.233'
+console.log($baseUrl)
+Vue.prototype.$baseUrl = Vue.$baseUrl = $baseUrl
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
