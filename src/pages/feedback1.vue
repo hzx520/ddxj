@@ -3,25 +3,24 @@
     <!-- <Table :columns="columns" :data="list"></Table> -->
     <div v-if="list && list.length > 0" class="order-list">
       <div class="order-th">
-        <div class="td" style="width: 38%;">订单号</div>
-        <div class="td" style="width: 38%;">评价时间</div>
-        <div class="td" style="width: 20%;">操作</div>
+        <div class="td" style="width: 48%;">反馈时间</div>
+        <div class="td" style="width: 48%;">反馈状态</div>
       </div>
       <div class="order-body">
         <div class="order-tr" v-for="(item, index) in list" :key="index" @click="$router.push({path: 'feedbackDetail', query:{id:index}})">
-          <div class="td" style="width: 38%;">
-            <div>123456</div>
+          <div class="td" style="width: 48%;">
+            <div>{{item.time}}</div>
           </div>
-          <div class="td" style="width: 38%;">
-            <div>2019-09-01</div>
+          <div class="td" style="width: 48%;">
+            <div v-if="index == 0" class="daifuwu">未处理</div>
+            <div v-if="index" class="fuwuzhong">已处理</div>
           </div>
-          <div class="td" style="width: 20%;">查看</div>
         </div>
       </div>
     </div>
-    <div v-else class="no-order">暂无评价</div>
+    <div v-else class="no-order">暂无意见反馈</div>
     <div class="feedbackBtn">
-      <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'feedbackDetail'})">我要评价</Button>
+      <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'feedbackDetail'})">我要反馈</Button>
     </div>
   </div>
 </template>

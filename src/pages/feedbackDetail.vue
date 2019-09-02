@@ -28,27 +28,31 @@
 </template>
 
 <script>
+import utils from '../utils';
 export default {
   name: 'feedbackdetail',
   data () {
     return {
-      msg: '首页',
       text: '',
       phoneNo: '',
-      id: ''
+      id: '',
+      openid: '',
+      isSubmit: false
     }
   },
   mounted() {
     this.id = this.$route.query.id;
+    let openid = utils.dbGet('openid');
+    this.openid = openid && openid.data ? openid.data : openid;
     if(!this.id) {
       return;
     }
     let params = {
       id: this.id,
-      openid: 'openid'
+      // openId: this.openid
     }
     this.$http.post(this.$baseUrl + '/api/feedback/query', params).then(res => {
-      this.list = res.data.list || [];
+      this.text = res;
     }).catch(err => {
       console.log(err)
     })
@@ -56,10 +60,11 @@ export default {
   methods: {
     submit() {
       let params = {
-        
+        feedback: this.text,
+        openId: this.openid
       }
       this.$http.post(this.$baseUrl + '/api/feedback/save', params).then(res => {
-        this.list = res.data.list || [];
+        this.isSubmit = true;
       }).catch(err => {
         console.log(err)
       })
