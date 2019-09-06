@@ -24,10 +24,14 @@
               <span slot="open">￥{{price1.cost}}/{{price1.serviceName}}</span>
               <span slot="close">￥{{price2.cost}}/{{price2.serviceName}}</span>
           </i-switch>
-          <Icon class="grey" type="md-alert"/>
+          <!-- <Icon class="grey" type="md-alert"/> -->
+          <Icon class="huise" type="md-arrow-back" style="font-size:16px;"/>
+          <!-- <Icon class="grey" type="md-arrow-round-back" style="font-size:16px;"/> -->
           <span class="huise">点击选择服务周期</span>
       </div>
-      <div class="name" style="padding-bottom:8px;">服务周期 （{{addForm.open ? price1.startTime : price2.startTime}} ~ {{addForm.open ? price1.endTime : price2.endTime}}）</div>
+      <div class="name" style="line-height:22px;padding-bottom:15px;">预计服务周期 （{{addForm.open ? price1.startTime : price2.startTime}} ~ {{addForm.open ? price1.endTime : price2.endTime}}）</div>
+      <!-- <div style="padding:3px 0 0 15px;font-size:13px;line-height:15px;">具体服务周期请至：我的-个人中心-我的订单 中查看</div>
+      <div class="huise" style="padding:0 0 15px 15px;font-size:13px;">首单优惠：月付前三天免费，年付前10天免费</div> -->
       <hr>
       <!-- <div class="tip" style="padding-top:3px;">
           <Icon class="grey" type="md-alert"/>
