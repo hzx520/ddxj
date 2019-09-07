@@ -4,20 +4,20 @@
         <i-input class="order_input" v-model="addForm.name" size="large" placeholder="请输入联系人(可选)"  style="width: 100%;"></i-input>
       <hr>
       <div class="name">联系方式</div>
-      <i-input class="order_input" v-model="addForm.phoneNo" size="large" @on-blur="inputBlur" placeholder="请输入联系方式(可选)" :disabled="!!id" style="width: 100%;"></i-input>
+      <i-input class="order_input" v-model="addForm.phoneNo" size="large" @on-blur="inputBlur" placeholder="请输入联系方式(可选)" :disabled="!!orderNo" style="width: 100%;"></i-input>
       <hr>
       <div class="name">所在小区</div>
-      <!-- <i-select class="order_input" :model.sync="city" @on-change="cityChange" :label-in-value="true" size="large" placeholder="请选择所在小区" :disabled="!!id">
-          <i-option v-for="(item, index) in cityList" :key="index" :value="item.villageName">{{item.villageName}}</i-option>
+      <!-- <i-select class="order_input" :model.sync="village" @on-change="villageChange" :label-in-value="true" size="large" placeholder="请选择所在小区" :disabled="!!orderNo">
+          <i-option v-for="(item, index) in villageList" :key="index" :value="item.villageName">{{item.villageName}}</i-option>
           <i-option value="shanghai">上海</i-option>
           <i-option value="hangzhou">杭州</i-option>
       </i-select> -->
-      <Select class="order_input" v-model="addForm.city" @on-change="cityChange" size="large" placeholder="请选择所在小区" :disabled="!!id">
-        <Option v-for="(item, index) in cityList" :key="index" :value="item.villageName">{{item.villageName}}</Option>
+      <Select class="order_input" v-model="addForm.village" @on-change="villageChange" size="large" placeholder="请选择所在小区" :disabled="!!orderNo">
+        <Option v-for="(item, index) in villageList" :key="index" :value="item.id">{{item.villageName}}</Option>
       </Select>
       <hr>
       <div class="name">详细地址</div>
-      <i-input class="order_input" v-model="addForm.address" size="large" @on-blur="inputBlur" placeholder="请输入详细地址" :disabled="!!id" style="width: 100%;"></i-input>
+      <i-input class="order_input" v-model="addForm.address" size="large" @on-blur="inputBlur" placeholder="请输入详细地址" :disabled="!!orderNo" style="width: 100%;"></i-input>
       <hr>
       <div class="open">
           <i-switch v-model="addForm.open" size="large" @on-change="getTime" style="width:94px;">
@@ -29,7 +29,7 @@
           <!-- <Icon class="grey" type="md-arrow-round-back" style="font-size:16px;"/> -->
           <span class="huise">点击选择服务周期</span>
       </div>
-      <div class="name" style="line-height:22px;padding-bottom:15px;">预计服务周期 （{{addForm.open ? price1.startTime : price2.startTime}} ~ {{addForm.open ? price1.endTime : price2.endTime}}）</div>
+      <div class="name" style="line-height:22px;padding-bottom:15px;">预计服务周期 （{{price.startTime}} ~ {{price.endTime}}）</div>
       <!-- <div style="padding:3px 0 0 15px;font-size:13px;line-height:15px;">具体服务周期请至：我的-个人中心-我的订单 中查看</div>
       <div class="huise" style="padding:0 0 15px 15px;font-size:13px;">首单优惠：月付前三天免费，年付前10天免费</div> -->
       <hr>
@@ -44,11 +44,11 @@
       <div style="padding-top:3px;">
         <div class="tip" v-for="(item, index) in tipList" :key="index">
             <Icon class="grey" type="md-alert"/>
-            <span class="huise">{{item.msg}}</span>
+            <span class="huise">{{item.content}}</span>
         </div>
       </div>
 
-      <div v-if="!id" class="payBtn">
+      <div v-if="!orderNo" class="payBtn">
         <Button size="large" type="warning" long style="height:40px;width:90%;" @click="submitPay">支付</Button>
       </div>
   </div>
@@ -63,26 +63,21 @@ export default {
   name: 'order',
   data () {
     return {
-      name: '',
-      phoneNo: '',
-      city: '',
-      address: '',
+      orderNo: '',
       addForm: {
         name: '',
         phoneNo: '',
-        city: '',
+        village: '',
         address: '',
       },
-      startTime: '',
-      endTime: '',
       open: true,
       isWXIos: false,
-      id: '',
       code: null,
       openid: '',
       res: '',
       tipList: [],
-      cityList: [],
+      villageList: [],
+      price: {},
       price1: {
         cost: 480,
         serviceName: '包年',
@@ -96,36 +91,33 @@ export default {
         serviceType: 2,
         startTime: '',
         endTime: ''
-      }
+      },
+      orderNoInit: ''
     }
   },
   created() {
-    this.id = this.$route.query.id;
-    if(!this.id) {
+    this.orderNo = this.$route.query.orderNo;
+    if(!this.orderNo) {
       let openid = utils.dbGet('openid') || '';
       this.openid = openid && openid.data ? openid.data : openid;
-      if(this.openid && this.openid != 'undefined') {
-        return
-      }
-      this.getCode();
-      if(!this.getCode()) {
-        this.authorize();
-      }else {
-        this.getOpenid();
+      if(!this.openid && this.openid == 'undefined') {
+        if(!this.getCode()) {
+          this.authorize();
+        }else {
+          this.getOpenid();
+        }
       }
     }else {
       this.queryOrderDetail();
     }
-  },
-  mounted() {
-    if(!this.id) {
-      this.getTime();
-    }else {
-
-    }
+    this.getTime();
     this.getTips();
+    this.getOrderInit();
     this.getCityList();
     this.isWXIos = this.isWeiXinAndIos();
+  },
+  mounted() {
+
   },
   watch:{
     
@@ -146,15 +138,20 @@ export default {
     },
     queryOrderDetail() {
       let params = {
-        id: this.id
+        orderNo: this.orderNo
       }
       
       this.$http.post(this.$baseUrl + '/api/order/query', params).then(res => {
+        console.log(res)
         this.addForm = {
-          name: res.name,
-          phoneNo: res.mobile,
-          city: res.village,
-          address: res.addr
+          name: res.data.data.name,
+          phoneNo: res.data.data.mobile,
+          village: res.data.data.village,
+          address: res.data.data.addr
+        }
+        this.price = {
+          startTime: res.data.data.startTime,
+          endTime: res.data.data.endTime
         }
       }).catch(err => {
         console.log(err)
@@ -162,7 +159,7 @@ export default {
     },
     submitPay() {
       console.log(this.addForm.name)
-      if(!this.addForm.city) {
+      if(!this.addForm.village) {
         this.$Message.warning('请选择小区');
         return;
       }
@@ -170,13 +167,19 @@ export default {
         this.$Message.warning('请输入地址');
         return;
       }
+      let payNo = Math.ceil(Math.random()*1000000)
       let params = {
+        openId: this.openid,
+        orderNo: this.orderNoInit,
         name: this.addForm.name,
         mobile: this.addForm.phoneNo,
-        village: this.addForm.city,
+        village: this.addForm.village,
         addr: this.addForm.address,
-        status: 1,
-        openId: this.openid
+        serviceType: this.price.serviceType,
+        startTime: this.price.startTime,
+        endTime: this.price.endTime,
+        cost: this.price.cost,
+        payNo: payNo
       }
       if(this.addForm.open) {
         params = Object.assign(params, {serviceType: this.price1.serviceType, startTime: this.price1.startTime, endTime: this.price1.endTime})
@@ -211,58 +214,68 @@ export default {
       return this.code;
     },
     getOpenid() {
-      this.$http.post(this.$baseUrl + '/api/wechat/getOpenId' + '?code=' + this.code, {code: this.code}).then(res => {
-        this.openid = res;
+      this.$http.post(this.$baseUrl + '/api/wechat/getOpenId', {code: this.code}).then(res => {
+        this.openid = res.data.openId;
+        console.log(res)
+        console.log(this.openid)
         utils.dbSet('openid', this.openid);
+        // debugger
       }).catch(err => {
         console.log(err)
       })
     },
     getTips() {
-      this.$http.post(this.$baseUrl + '/api/remind/queryList', {current: 1}).then(res => {
+      this.$http.post(this.$baseUrl + '/api/remind/queryList', {pageNo: 1, pageSize: 10, remindType: 1}).then(res => {
         this.tipList = res.data.list || [];
       }).catch(err => {
         console.log(err)
       })
     },
-    getCityList() {
-      this.$http.post(this.$baseUrl + '/api/serviceInfo/queryNameList', {current: 1,pageSize:1000}).then(res => {
-        this.cityList = res.data.list || [];
+    getOrderInit() {
+      this.$http.post(this.$baseUrl + '/api/order/init', {openId: this.openid}).then(response => {
+        console.log(response)
+        let res = response.data;
+        this.addForm = {
+          name: res.data.name,
+          phoneNo: res.data.mobile,
+          village: res.data.village,
+          address: res.data.addr
+        }
+        this.orderNoInit = res.data.orderNo
       }).catch(err => {
         console.log(err)
       })
     },
-    cityChange(item) {
-      // if(this.addForm.city == item.villageName) {
-      //   return;
-      // }
-      // this.addForm.city = item.villageName;
-      console.log(this.addForm.city)
-      this.$http.post(this.$baseUrl + '/api/serviceInfo/queryTypeList', {villageName: this.addForm.city}).then(res => {
-        this.price1 = {
-          cost: res[0].cost, 
-          serviceName: res[0].serviceName, 
-          serviceType: res[0].serviceType,
-          startTime: res[0].startTime,
-          endTime: res[0].endTime,
-        }
-        this.price2 = {
-          cost: res[1].cost, 
-          serviceName: res[1].serviceName, 
-          serviceType: res[1].serviceType,
-          startTime: res[1].startTime,
-          endTime: res[1].endTime,
-        }
+    getCityList() {
+      this.$http.post(this.$baseUrl + '/api/village/queryList', {pageNo: 1,pageSize: 9999,openId: this.openid}).then(res => {
+        this.villageList = res.data.list || [];
       }).catch(err => {
         console.log(err)
       })
+    },
+    villageChange() {
+      console.log(this.addForm.village)
+      let obj = this.villageList.find(item => {
+        return item.id == this.addForm.village;
+      }) || {}
+      let res = obj.serviceInfoList || [];
+      this.price1 = res[0];
+      this.price2 = res[1];
     },
     getTime() {
-      this.price1.startTime = this.price2.startTime = moment().add(1, 'days').format('YYYY-MM-DD');
-      if(this.addForm.open) {
-        this.price1.endTime = moment().add(1, 'years').format('YYYY-MM-DD');
+      if(!this.addForm.village) {
+        this.price.startTime = moment().add(1, 'days').format('YYYY-MM-DD');
+        if(this.addForm.open) {
+          this.price.endTime = moment().add(1, 'years').format('YYYY-MM-DD');
+        }else {
+          this.price.endTime = moment().add(1, 'months').format('YYYY-MM-DD');
+        }
       }else {
-        this.price2.endTime = moment().add(1, 'months').format('YYYY-MM-DD');
+        if(this.addForm.open) {
+          this.price = this.price1;
+        }else {
+          this.price = this.price2;
+        }
       }
     }
   },
@@ -326,6 +339,10 @@ export default {
       .huise {
          color: #d2d2d2;
          line-height: 25px;
+      }
+      .tip .huise {
+        line-height: 20px;
+        font-size: 13px;
       }
       .mt10 {
         margin-top: 10px;

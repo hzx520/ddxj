@@ -1,7 +1,7 @@
 <template>
   <div class="my">
     <div class="wx-head" @click="modal = true;">
-      <img src="../assets/touxiang.svg" class="wx-head-pic">
+      <!-- <img src="../assets/touxiang.svg" class="wx-head-pic"> -->
       <img :src="info.headimgurl || '../assets/touxiang.svg'" class="wx-head-pic">
       <span class="wx-name">{{info.nickname}}</span>
       <img src="../assets/erweima.svg" class="wx-erweima-pic">
@@ -13,7 +13,7 @@
     <div class="line"></div>
     <div class="my-order" @click="$router.push({path: 'feedback'})">
       <img src="../assets/mes-icon.svg" class="icon-order">
-      <span>意见反馈</span>
+      <span>我的评价</span>
     </div>
     <Modal v-model="modal" class-name="my-modal" :closable="false" :footer-hide="true">
         <div class="qrcode-head">
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="qrcode-body">
-            <img src="../assets/erweima.svg" class="wx-qrcode-pic">
+            <img :src="qrCodeUrl" class="wx-qrcode-pic">
         </div>
         <div class="qrcode-footer">扫一扫上面的二维码图，关注公众号</div>
         
@@ -43,7 +43,8 @@ export default {
       modal: false,
       info: {
 
-      }
+      },
+      qrCodeUrl: ''
     }
   },
   created(){
@@ -58,15 +59,25 @@ export default {
           this.getOpenid();
         }
       }
+    this.getQRCode();
 
   },
   methods: {
     getUserInfo(openid) {
-        this.$http.post(this.$baseUrl + '/api/wechat/getUserInfo?openId=' + openid, {openId: 'openId'}).then(res => {
-          this.info = res;
+        this.$http.post(this.$baseUrl + '/api/wechat/getUserInfo', {openId: openid}).then(res => {
+          console.log('xinxi',res)
+          this.info = res.data;
         }).catch(err => {
           console.log(err)
         })
+    },
+    getQRCode() {
+      this.$http.post(this.$baseUrl + '/api/wechat/getQRCode', {}).then(res => {
+        console.log(res)
+        this.qrCodeUrl = res.data.qrcodeUrl;
+      }).catch(err => {
+        console.log(err)
+      })
     },
     authorize() {
       let appId = 'wx1ea6607052b21894';

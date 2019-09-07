@@ -5,23 +5,23 @@
       <div class="order-th">
         <div class="td" style="width: 38%;">订单号</div>
         <div class="td" style="width: 38%;">评价时间</div>
-        <div class="td" style="width: 20%;">操作</div>
+        <div class="td" style="width: 20%;">状态</div>
       </div>
       <div class="order-body">
         <div class="order-tr" v-for="(item, index) in list" :key="index" @click="$router.push({path: 'feedbackDetail', query:{id:index}})">
           <div class="td" style="width: 38%;">
-            <div>123456</div>
+            <div style="word-wrap:break-word;word-break:break-all">{{item.orderNo}}</div>
           </div>
           <div class="td" style="width: 38%;">
-            <div>2019-09-01</div>
+            <div>{{item.createTime}}</div>
           </div>
-          <div class="td" style="width: 20%;">查看</div>
+          <div class="td" style="width: 20%;">{{item.evaluateStatus}}</div>
         </div>
       </div>
     </div>
     <div v-else class="no-order">暂无评价</div>
     <div class="feedbackBtn">
-      <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'feedbackDetail'})">我要评价</Button>
+      <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'myOrder'})">我要评价</Button>
     </div>
   </div>
 </template>
@@ -53,11 +53,12 @@ export default {
     let openid = utils.dbGet('openid');
     openid = openid && openid.data ? openid.data : openid;
     let params = {
-      current: 1,
+      pageNo: 1,
       pageSize: 10,
-      openId: 'openId'
+      openId: openid
     }
-    this.$http.post(this.$baseUrl + '/api/feedback/queryList', params).then(res => {
+    this.$http.post(this.$baseUrl + '/api/evaluate/queryList', params).then(res => {
+      console.log(res)
       this.list = res.data.list || [];
     }).catch(err => {
       console.log(err)

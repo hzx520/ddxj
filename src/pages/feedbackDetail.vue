@@ -1,15 +1,15 @@
 <template>
   <div class="feedback-detail">
-    <div v-if="!id">
+    <div v-if="!view">
       <div v-if="!isSubmit" class="feedback-form">
         <div class="feedfack-tip">请提出您宝贵的意见</div>
-        <Input v-model="text" type="textarea" :autosize="{minRows: 4,maxRows: 7}" placeholder="欢迎反馈，我们将为您不断改进" :disabled="id"/>
-        <div class="phone">
+        <Input v-model="text" type="textarea" :autosize="{minRows: 4,maxRows: 7}" placeholder="欢迎反馈，我们将为您不断改进"/>
+        <!-- <div class="phone">
           <span class="phone-txt">联系方式：</span>
-            <i-input class="phone-input" :value.sync="phoneNo" size="large" placeholder="请输入手机号或邮箱" :disabled="id" style=""></i-input>
-        </div>
+            <i-input class="phone-input" :value.sync="phoneNo" size="large" placeholder="请输入手机号或邮箱" :disabled="orderNo" style=""></i-input>
+        </div> -->
       </div>
-      <div v-else class="submit-tip">我们会第一时间处理您的反馈，并第一时间给您回复</div>
+      <div v-else class="submit-tip" style="text-align:center;">我们会第一时间处理您的反馈，并给您回复</div>
       <div class="feedbackBtn">
         <!-- <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'order'})">取消</Button>
         <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'order'})">提交</Button> -->
@@ -19,9 +19,14 @@
         </ButtonGroup>
       </div>
     </div>
-    <div v-if="id" class="result">
+    <div v-if="view" class="result">
       <div class="result-tip">反馈结果</div>
-      <div class="result-txt">我是反馈结果我是反馈结果我是反馈结果我是反馈结果</div>
+      <div>订单号：{{orderNo}}</div>
+      <div>评价时间：{{result.createTime}}</div>
+      <div>评价内容：{{result.content}}</div>
+      <div>反馈时间：{{result.updateTime}}</div>
+      <div>反馈内容：{{result.feedBack}}</div>
+      <!-- <div class="result-txt">我是反馈结果我是反馈结果我是反馈结果我是反馈结果</div> -->
       <!-- <div class="">正在紧急处理中</div> -->
     </div>
   </div>
@@ -35,24 +40,28 @@ export default {
     return {
       text: '',
       phoneNo: '',
-      id: '',
+      orderNo: '',
+      view: 1,
       openid: '',
-      isSubmit: false
+      isSubmit: false,
+      result: {}
     }
   },
   mounted() {
-    this.id = this.$route.query.id;
+    this.orderNo = this.$route.query.orderNo;
+    this.view = this.$route.query.view;
     let openid = utils.dbGet('openid');
     this.openid = openid && openid.data ? openid.data : openid;
-    if(!this.id) {
+    if(!this.view) {
       return;
     }
     let params = {
-      id: this.id,
-      // openId: this.openid
+      orderNo: this.orderNo
     }
-    this.$http.post(this.$baseUrl + '/api/feedback/query', params).then(res => {
-      this.text = res;
+    this.$http.post(this.$baseUrl + '/api/evaluate/query', params).then(res => {
+      // this.text = res;
+      console.log(res);
+      this.result = res.data.data;
     }).catch(err => {
       console.log(err)
     })
@@ -60,10 +69,11 @@ export default {
   methods: {
     submit() {
       let params = {
-        feedback: this.text,
+        orderNo: this.orderNo,
+        content: this.text,
         openId: this.openid
       }
-      this.$http.post(this.$baseUrl + '/api/feedback/save', params).then(res => {
+      this.$http.post(this.$baseUrl + '/api/evaluate/save', params).then(res => {
         this.isSubmit = true;
       }).catch(err => {
         console.log(err)

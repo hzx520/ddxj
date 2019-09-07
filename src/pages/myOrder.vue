@@ -6,21 +6,32 @@
         <div class="td" style="width: 36%;">服务时间</div>
         <div class="td" style="width: 22%;">服务周期</div>
         <div class="td" style="width: 22%;">服务状态</div>
-        <div class="td" style="width: 16%;">操作</div>
+        <div class="td" style="width: 16%;">评价</div>
       </div>
       <div class="order-body">
         <div class="order-tr" v-for="(item, index) in list" :key="index">
-          <div class="td" style="width: 40%;" @click="$router.push({path: 'order1', query:{id:index}})">
-            <div>{{item.time}}</div>
-            <div>{{item.time}}</div>
+          <div class="td" style="width: 40%;" @click="$router.push({path: 'order1', query:{orderNo: item.orderNo}})">
+            <div style="display:flex;">
+              <div>
+                <Icon v-if="item.status == 0" type="ios-information-circle-outline" style="color:#ff0000;"/>
+                <Icon v-if="item.status == 1" type="ios-information-circle-outline" style="color:#FF8000;"/>
+                <Icon v-if="item.status == 2" type="ios-radio-button-on" style="color:#76EE00;"/>
+                <Icon v-if="item.status == 3" type="ios-time-outline" style="color:#9C9C9C;"/>
+              </div>
+              <div>
+                <div>{{item.startTime}}</div>
+                <div>{{item.endTime}}</div>
+              </div>
+            </div>
           </div>
-          <div class="td" style="width: 20%;" @click="$router.push({path: 'order1', query:{id:index}})">{{item.period}}</div>
-          <div class="td" style="width: 20%;" @click="$router.push({path: 'order1', query:{id:index}})">
-            <div v-if="index == 0" class="daifuwu">待服务</div>
+          <div class="td" style="width: 20%;" @click="$router.push({path: 'order1', query:{orderNo:item.orderNo}})">{{item.serviceName}}</div>
+          <div class="td" style="width: 20%;" @click="$router.push({path: 'order1', query:{orderNo:item.orderNo}})">
+            <!-- <div v-if="index == 0" class="daifuwu">待服务</div>
             <div v-if="index == 1" class="fuwuzhong">服务中</div>
-            <div v-if="index == 2">已过期</div>
+            <div v-if="index == 2">已过期</div> -->
+            <div>{{item.statusName}}</div>
           </div>
-          <div class="td" style="width: 16%;color: blue;" @click="$router.push({path: 'feedback', query:{orderId:index}})">评价</div>
+          <div class="td" style="width: 16%;color: blue;" @click="$router.push({path: 'feedbackDetail', query:{orderNo: item.orderNo, view:item.evaluateStatus==0?'':'1'}})">{{item.evaluateStatus == 0 ? '评价' : '查看'}}</div>
         </div>
       </div>
     </div>
@@ -58,12 +69,14 @@ export default {
     let openid = utils.dbGet('openid');
     openid = openid && openid.data ? openid.data : openid;
     let params = {
-      current: 1,
+      pageNo: 1,
       pageSize: 10,
-      openId: 'openId'
+      openId: openid
     }
     this.$http.post(this.$baseUrl + '/api/order/queryList', params).then(res => {
-      // this.list = res.data.list || [];
+      console.log('列表', res)
+      this.list = res.data.list || [];
+      console.log(this.list)
     }).catch(err => {
       console.log(err)
     })
