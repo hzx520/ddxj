@@ -15,6 +15,11 @@
       <img src="../assets/mes-icon.svg" class="icon-order">
       <span>我的评价</span>
     </div>
+    <div class="line"></div>
+    <div class="my-order" @click="clearOpenid">
+      <img src="../assets/mes-icon.svg" class="icon-order">
+      <span>清除缓存</span>
+    </div>
     <Modal v-model="modal" class-name="my-modal" :closable="false" :footer-hide="true">
         <div class="qrcode-head">
             <img :src="info.headimgurl || '../assets/touxiang.svg'" class="wx-avatar-pic">
@@ -50,7 +55,7 @@ export default {
   created(){
       let openid = utils.dbGet('openid') || '';
       openid = openid && openid.data ? openid.data : openid;
-      if(openid && openid != 'undefined') {
+      if(openid && openid != 'undefined' && openid != 'null') {
         this.getUserInfo(openid)
       }else {
         if(!this.getCode()) {
@@ -82,6 +87,7 @@ export default {
     authorize() {
       let appId = 'wx1ea6607052b21894';
       let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2fme';
+      // let redirect = 'http%3a%2f%2fwww.cx-tech.co%3a8010%2f%23%2fme';
       let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
       window.location.href = url;
     },
@@ -102,13 +108,17 @@ export default {
     },
     getOpenid() {
       this.$http.post(this.$baseUrl + '/api/wechat/getOpenId' + '?code=' + this.code,{code: this.code}).then(res => {
-        this.openid = res;
+        this.openid = res.data.openId;
         this.getUserInfo(this.openid)
         utils.dbSet('openid', this.openid);
       }).catch(err => {
         console.log(err)
       })
     },
+    clearOpenid() {
+      utils.dbRemove('openid');
+      this.$router.push({path:'my'});
+    }
   }
 }
 </script>

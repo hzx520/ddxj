@@ -8,7 +8,7 @@
         <div class="td" style="width: 20%;">状态</div>
       </div>
       <div class="order-body">
-        <div class="order-tr" v-for="(item, index) in list" :key="index" @click="$router.push({path: 'feedbackDetail', query:{id:index}})">
+        <div class="order-tr" v-for="(item, index) in list" :key="index" @click="$router.push({path: 'feedbackDetail', query:{orderNo:item.orderNo, view: 1}})">
           <div class="td" style="width: 38%;">
             <div style="word-wrap:break-word;word-break:break-all">{{item.orderNo}}</div>
           </div>

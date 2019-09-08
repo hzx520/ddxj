@@ -17,19 +17,26 @@
       </Select>
       <hr>
       <div class="name">详细地址</div>
-      <i-input class="order_input" v-model="addForm.address" size="large" @on-blur="inputBlur" placeholder="请输入详细地址" :disabled="!!orderNo" style="width: 100%;"></i-input>
+      <i-input class="order_input" v-model="addForm.address" size="large" @on-blur="inputBlur" placeholder="请输入具体门牌号" :disabled="!!orderNo" style="width: 100%;"></i-input>
       <hr>
-      <div class="open">
+      <!-- <div class="open">
           <i-switch v-model="addForm.open" size="large" @on-change="getTime" style="width:94px;">
               <span slot="open">￥{{price1.cost}}/{{price1.serviceName}}</span>
               <span slot="close">￥{{price2.cost}}/{{price2.serviceName}}</span>
           </i-switch>
-          <!-- <Icon class="grey" type="md-alert"/> -->
           <Icon class="huise" type="md-arrow-back" style="font-size:16px;"/>
-          <!-- <Icon class="grey" type="md-arrow-round-back" style="font-size:16px;"/> -->
           <span class="huise">点击选择服务周期</span>
+      </div> -->
+
+
+      <div class="name">服务方式</div>
+      <div class="service">
+        <div class="service-inner">
+          <div v-for="(item, index) in priceList" :key="index" class="service-btn" :class="{active: priceIndex == index}" @click="changePrice(index)">￥{{item.cost + '/' + item.serviceName}}</div>
+        </div>
       </div>
-      <div class="name" style="line-height:22px;padding-bottom:15px;">预计服务周期 （{{price.startTime}} ~ {{price.endTime}}）</div>
+      
+      <div class="name" style="line-height:22px;padding-bottom:10px;font-size:13px;color:#666;">预计服务周期 （{{price.startTime}} ~ {{price.endTime}}）</div>
       <!-- <div style="padding:3px 0 0 15px;font-size:13px;line-height:15px;">具体服务周期请至：我的-个人中心-我的订单 中查看</div>
       <div class="huise" style="padding:0 0 15px 15px;font-size:13px;">首单优惠：月付前三天免费，年付前10天免费</div> -->
       <hr>
@@ -74,46 +81,46 @@ export default {
       isWXIos: false,
       code: null,
       openid: '',
-      res: '',
       tipList: [],
       villageList: [],
       price: {},
-      price1: {
+      priceIndex: 0,
+      priceList: [{
         cost: 480,
         serviceName: '包年',
         serviceType: 1,
-        startTime: '',
-        endTime: ''
-      },
-      price2: {
+        startTime: moment().add(1, 'days').format('YYYY-MM-DD'),
+        endTime: moment().add(1, 'years').format('YYYY-MM-DD')
+      },{
         cost: 50,
         serviceName: '包月',
         serviceType: 2,
-        startTime: '',
-        endTime: ''
-      },
+        startTime: moment().add(1, 'days').format('YYYY-MM-DD'),
+        endTime: moment().add(1, 'months').format('YYYY-MM-DD')
+      }],
       orderNoInit: ''
     }
   },
   created() {
     this.orderNo = this.$route.query.orderNo;
-    if(!this.orderNo) {
-      let openid = utils.dbGet('openid') || '';
-      this.openid = openid && openid.data ? openid.data : openid;
-      if(!this.openid && this.openid == 'undefined') {
-        if(!this.getCode()) {
-          this.authorize();
-        }else {
-          this.getOpenid();
-        }
-      }
-    }else {
+    let openid = utils.dbGet('openid') || '';
+    this.openid = openid && openid.data ? openid.data : openid;
+    this.price = this.priceList[0] || {};
+    if(this.orderNo) {
       this.queryOrderDetail();
     }
-    this.getTime();
-    this.getTips();
-    this.getOrderInit();
-    this.getCityList();
+    if(!this.openid || this.openid == 'undefined' || this.openid == 'null') {
+      if(!this.getCode()) {
+        this.authorize();
+      }else {
+        this.getOpenid();
+      }
+    } else {
+      // this.getTime();
+      this.getTips();
+      this.getOrderInit();
+      this.getCityList();
+    }
     this.isWXIos = this.isWeiXinAndIos();
   },
   mounted() {
@@ -158,6 +165,7 @@ export default {
       })
     },
     submitPay() {
+      console.log('price',this.price)
       console.log(this.addForm.name)
       if(!this.addForm.village) {
         this.$Message.warning('请选择小区');
@@ -181,20 +189,33 @@ export default {
         cost: this.price.cost,
         payNo: payNo
       }
-      if(this.addForm.open) {
-        params = Object.assign(params, {serviceType: this.price1.serviceType, startTime: this.price1.startTime, endTime: this.price1.endTime})
-      }else {
-        params = Object.assign(params, {serviceType: this.price2.serviceType, startTime: this.price2.startTime, endTime: this.price2.endTime})
-      }
       this.$http.post(this.$baseUrl + '/api/order/save', params).then(res => {
-
+        this.$Message.success('成功');
       }).catch(err => {
         console.log(err)
       })
     },
+    weixinPay(data) {
+      let appId = 'wx1ea6607052b21894';
+      let timestamp = new Date().getTime();
+      let nonceStr = '5K8264ILTKCH16CQ2502SI8ZNMTM67VS';
+      let signature = 'C380BEC2BFD727A4B6845133519F3AD6';
+      let packages = data.package;
+      let paySign = data.paySign;
+      wx.config({
+      debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+      appId: appId, // 必填，公众号的唯一标识
+      timestamp: timestamp, // 必填，生成签名的时间戳
+      nonceStr: nonceStr, // 必填，生成签名的随机串
+      signature: signature, // 必填，签名，见附录1
+      jsApiList: ['chooseWXPay',"updateAppMessageShareData"] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+
+      });
+    },
     authorize() {
       let appId = 'wx1ea6607052b21894';
-      let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2forder';
+      let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2forder1';
+      // let redirect = 'http%3a%2f%2fwww.cx-tech.co%3a8010%2f%23%2forder1';
       let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
       window.location.href = url;
     },
@@ -218,6 +239,10 @@ export default {
         this.openid = res.data.openId;
         console.log(res)
         console.log(this.openid)
+        // this.getTime();
+        this.getTips();
+        this.getOrderInit();
+        this.getCityList();
         utils.dbSet('openid', this.openid);
         // debugger
       }).catch(err => {
@@ -241,14 +266,27 @@ export default {
           village: res.data.village,
           address: res.data.addr
         }
-        this.orderNoInit = res.data.orderNo
+        this.getVillageService();
+        this.orderNoInit = res.data.orderNo;
       }).catch(err => {
         console.log(err)
+      })
+    },
+    getVillageService() {      
+      if(!this.villageList || this.villageList.length == 0 || !this.addForm.village) {
+        return
+      }
+      this.villageList.forEach(item => {
+        if(this.addForm.village == item.id) {
+          this.priceList = item.serviceInfoList || [];
+          this.price = this.priceList[0];
+        }
       })
     },
     getCityList() {
       this.$http.post(this.$baseUrl + '/api/village/queryList', {pageNo: 1,pageSize: 9999,openId: this.openid}).then(res => {
         this.villageList = res.data.list || [];
+        this.getVillageService();
       }).catch(err => {
         console.log(err)
       })
@@ -259,24 +297,17 @@ export default {
         return item.id == this.addForm.village;
       }) || {}
       let res = obj.serviceInfoList || [];
-      this.price1 = res[0];
-      this.price2 = res[1];
+      this.priceList = res;
+      this.price = this.priceList[0]
+      this.priceIndex = 0;
+      this.price = this.priceList[0];
+    },
+    changePrice(index) {
+      this.priceIndex = index;
+      this.price = this.priceList[index];
     },
     getTime() {
-      if(!this.addForm.village) {
-        this.price.startTime = moment().add(1, 'days').format('YYYY-MM-DD');
-        if(this.addForm.open) {
-          this.price.endTime = moment().add(1, 'years').format('YYYY-MM-DD');
-        }else {
-          this.price.endTime = moment().add(1, 'months').format('YYYY-MM-DD');
-        }
-      }else {
-        if(this.addForm.open) {
-          this.price = this.price1;
-        }else {
-          this.price = this.price2;
-        }
-      }
+      
     }
   },
 }
@@ -358,6 +389,35 @@ export default {
         text-align: center;
         height: 40px;
         margin-top: 20px;
+      }
+      .service {
+        padding: 10px 0 0 10px;
+        .service-inner {
+          display: flex;
+          overflow: hidden;        
+          .service-btn {
+            flex: 1;
+            text-align: center;
+            line-height: 25px;
+            color: #FF8800;
+            font-size: 13px;
+            border: 1px solid #FF8800;
+            border-left: none;
+            &:first-child {
+              border-left: 1px solid #FF8800;
+              border-top-left-radius: 3px;
+              border-bottom-left-radius: 3px;
+            }
+            &:last-child {
+              border-top-right-radius: 3px;
+              border-bottom-right-radius: 3px;
+            }
+            &.active {
+              background: #FF8800;
+              color: #fff;
+            }
+          }
+        }
       }
     }
 </style>

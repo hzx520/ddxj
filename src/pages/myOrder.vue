@@ -3,15 +3,15 @@
     <!-- <Table :columns="columns" :data="list"></Table> -->
     <div v-if="list && list.length > 0" class="order-list">
       <div class="order-th">
-        <div class="td" style="width: 36%;">服务时间</div>
-        <div class="td" style="width: 22%;">服务周期</div>
-        <div class="td" style="width: 22%;">服务状态</div>
+        <div class="td" style="width: 40%;">服务时间</div>
+        <div class="td" style="width: 20%;">服务周期</div>
+        <div class="td" style="width: 20%;">服务状态</div>
         <div class="td" style="width: 16%;">评价</div>
       </div>
       <div class="order-body">
         <div class="order-tr" v-for="(item, index) in list" :key="index">
           <div class="td" style="width: 40%;" @click="$router.push({path: 'order1', query:{orderNo: item.orderNo}})">
-            <div style="display:flex;">
+            <div style="display:flex;justify-content: center;">
               <div>
                 <Icon v-if="item.status == 0" type="ios-information-circle-outline" style="color:#ff0000;"/>
                 <Icon v-if="item.status == 1" type="ios-information-circle-outline" style="color:#FF8000;"/>
