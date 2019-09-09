@@ -29,9 +29,11 @@ export default {
       let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2forder1';
       // let redirect = 'http%3a%2f%2fwww.cx-tech.co%3a8010%2f%23%2forder1';
       let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
-      window.location.href = url;
+      alert(111)
+      window.location.replace = url;
     }else {
-      this.$router.push({path: 'order1'})
+      alert(222)
+      this.$router.replace({path: 'order1'})
     }
   }
 }

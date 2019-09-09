@@ -1,10 +1,10 @@
 <template>
   <div class="order" id="order">
       <div class="name">联系人</div>
-        <i-input class="order_input" v-model="addForm.name" size="large" placeholder="请输入联系人(可选)"  style="width: 100%;"></i-input>
+        <i-input class="order_input" v-model="addForm.name" size="large" placeholder="请输入联系人(可选)" :readonly="!!orderNo"  style="width: 100%;"></i-input>
       <hr>
       <div class="name">联系方式</div>
-      <i-input class="order_input" v-model="addForm.phoneNo" size="large" @on-blur="inputBlur" placeholder="请输入联系方式(可选)" :disabled="!!orderNo" style="width: 100%;"></i-input>
+      <i-input class="order_input" v-model="addForm.phoneNo" size="large" @on-blur="inputBlur" placeholder="请输入联系方式(可选)" :readonly="!!orderNo" style="width: 100%;"></i-input>
       <hr>
       <div class="name">所在小区</div>
       <!-- <i-select class="order_input" :model.sync="village" @on-change="villageChange" :label-in-value="true" size="large" placeholder="请选择所在小区" :disabled="!!orderNo">
@@ -12,12 +12,12 @@
           <i-option value="shanghai">上海</i-option>
           <i-option value="hangzhou">杭州</i-option>
       </i-select> -->
-      <Select class="order_input" v-model="addForm.village" @on-change="villageChange" size="large" placeholder="请选择所在小区" :disabled="!!orderNo">
+      <Select class="order_input" v-model="addForm.village" @on-change="villageChange" size="large" placeholder="请选择所在小区" :readonly="!!orderNo">
         <Option v-for="(item, index) in villageList" :key="index" :value="item.id">{{item.villageName}}</Option>
       </Select>
       <hr>
       <div class="name">详细地址</div>
-      <i-input class="order_input" v-model="addForm.address" size="large" @on-blur="inputBlur" placeholder="请输入具体门牌号" :disabled="!!orderNo" style="width: 100%;"></i-input>
+      <i-input class="order_input" v-model="addForm.address" size="large" @on-blur="inputBlur" placeholder="请输入具体门牌号" :readonly="!!orderNo" style="width: 100%;"></i-input>
       <hr>
       <!-- <div class="open">
           <i-switch v-model="addForm.open" size="large" @on-change="getTime" style="width:94px;">
@@ -110,12 +110,16 @@ export default {
       this.queryOrderDetail();
     }
     if(!this.openid || this.openid == 'undefined' || this.openid == 'null') {
+      alert(333)
       if(!this.getCode()) {
+        alert(444)
         this.authorize();
       }else {
+        alert(555)
         this.getOpenid();
       }
     } else {
+      alert(666)
       // this.getTime();
       this.getTips();
       this.getOrderInit();
@@ -217,7 +221,7 @@ export default {
       let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2forder1';
       // let redirect = 'http%3a%2f%2fwww.cx-tech.co%3a8010%2f%23%2forder1';
       let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
-      window.location.href = url;
+      window.location.replace = url;
     },
     getCode() {
       var url_str = location.href // 获取整个地址栏的url_str
@@ -303,6 +307,9 @@ export default {
       this.price = this.priceList[0];
     },
     changePrice(index) {
+      if(!!this.orderNo) {
+        return;
+      }
       this.priceIndex = index;
       this.price = this.priceList[index];
     },
