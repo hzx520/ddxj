@@ -11,7 +11,7 @@
         </div>
         <div class="order-body">
           <div class="order-tr" v-for="(item, index) in list" :key="index">
-            <div class="td" style="width: 40%;" @click="$router.push({path: 'order1', query:{orderNo: item.orderNo}})">
+            <div class="td" style="width: 40%;" @click="$router.push({path: 'order', query:{orderNo: item.orderNo}})">
               <div style="display:flex;justify-content: center;">
                 <div>
                   <Icon v-if="item.status == 0" type="ios-information-circle-outline" style="color:#ff0000;"/>
@@ -25,8 +25,8 @@
                 </div>
               </div>
             </div>
-            <div class="td" style="width: 20%;" @click="$router.push({path: 'order1', query:{orderNo:item.orderNo}})">{{item.serviceName}}</div>
-            <div class="td" style="width: 20%;" @click="$router.push({path: 'order1', query:{orderNo:item.orderNo}})">
+            <div class="td" style="width: 20%;" @click="$router.push({path: 'order', query:{orderNo:item.orderNo}})">{{item.serviceName}}</div>
+            <div class="td" style="width: 20%;" @click="$router.push({path: 'order', query:{orderNo:item.orderNo}})">
               <!-- <div v-if="index == 0" class="daifuwu">待服务</div>
               <div v-if="index == 1" class="fuwuzhong">服务中</div>
               <div v-if="index == 2">已过期</div> -->
@@ -36,7 +36,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="no-order" @click="$router.push({path: 'order1'})">暂无订单，快去下单吧</div>
+      <div v-else class="no-order" @click="$router.push({path: 'order'})">暂无订单，快去下单吧</div>
     </Scroll>
   </div>
 </template>

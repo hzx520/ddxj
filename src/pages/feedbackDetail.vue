@@ -13,13 +13,15 @@
       <div class="feedbackBtn">
         <!-- <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'order'})">取消</Button>
         <Button size="large" type="warning" long style="height:40px;width:90%;" @click="$router.push({path: 'order'})">提交</Button> -->
-        <ButtonGroup  size="large" style="width: 100%;">
+        <ButtonGroup v-if="!isSubmit"  size="large" style="width: 100%;">
             <Button style="width:50%;" @click="$router.go(-1)">取消</Button>
             <Button type="warning" style="width:50%;" @click="submit">提交</Button>
         </ButtonGroup>
+        
+      <Button v-else size="large" long style="height:40px;width:90%;" @click="$router.go(-1)">返回</Button>
       </div>
     </div>
-    <div v-if="view" class="result">
+    <div v-if="!!view" class="result">
       <div class="result-tip">反馈结果</div>
       <div>订单号：{{orderNo}}</div>
       <div>评价时间：{{result.createTime}}</div>

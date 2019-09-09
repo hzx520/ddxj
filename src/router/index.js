@@ -2,9 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import home from '@/pages/home'
 import order from '@/pages/order'
-import order1 from '@/pages/order1'
+// import order1 from '@/pages/order1'
 import my from '@/pages/my'
-import me from '@/pages/me'
+// import me from '@/pages/me'
 import myOrder from '@/pages/myOrder'
 import feedback from '@/pages/feedback'
 import feedbackDetail from '@/pages/feedbackDetail'
@@ -23,21 +23,21 @@ export default new Router({
       name: 'order',
       component: order
     },
-    {
-      path: '/order1',
-      name: 'order1',
-      component: order1
-    },
+    // {
+    //   path: '/order1',
+    //   name: 'order1',
+    //   component: order1
+    // },
     {
       path: '/my',
       name: 'my',
       component: my
     },
-    {
-      path: '/me',
-      name: 'me',
-      component: me
-    },
+    // {
+    //   path: '/me',
+    //   name: 'me',
+    //   component: me
+    // },
     {
       path: '/myOrder',
       name: 'myOrder',
