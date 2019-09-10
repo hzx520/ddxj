@@ -89,7 +89,7 @@ export default {
       let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2fmy';
       // let redirect = 'http%3a%2f%2fwww.cx-tech.co%3a8010%2f%23%2fme';
       let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
-      window.location.replace = url;
+      window.location.replace(url);
     },
     getCode() {
       var url_str = location.href // 获取整个地址栏的url_str
@@ -116,8 +116,10 @@ export default {
       })
     },
     clearOpenid() {
-      utils.dbRemove('openid');
-      this.$router.push({path:'my'});
+      utils.dbRemove('openid');      
+      this.$Message.success('已清除');
+      // this.$router.push({path:'my'});
+      window.reload();
     }
   }
 }
