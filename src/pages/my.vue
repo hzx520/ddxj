@@ -111,6 +111,7 @@ export default {
         this.openid = res.data.openId;
         this.getUserInfo(this.openid)
         utils.dbSet('openid', this.openid);
+        utils.dbSet('code', this.code);
       }).catch(err => {
         console.log(err)
       })

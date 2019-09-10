@@ -1,7 +1,7 @@
 <template>
   <div class="myOrder">
     <!-- <Table :columns="columns" :data="list"></Table> -->
-    <Scroll :on-reach-bottom="loadMore" :on-reach-top="refresh" :height="height">
+    <Scroll :on-reach-bottom="loadMore" :on-reach-top="refresh" :distance-to-edge="[10,10]" :height="height">
       <div v-if="list && list.length > 0" class="order-list">
         <div class="order-th">
           <div class="td" style="width: 40%;">服务时间</div>
@@ -57,6 +57,8 @@ export default {
     }
   },
   created() {
+    // utils.dbSet('openid', 'opQDEvkDdan-WKZ0YoZY5MVEtliE');
+    // utils.dbSet('code', '011PQrpg0bmPfw1tLRrg0CuJpg0PQrpa');
     let openid = utils.dbGet('openid');
     this.openid = openid && openid.data ? openid.data : openid;
     this.queryList();
@@ -116,6 +118,7 @@ export default {
     .myOrder {
       height: 100%;
       .order-list {
+        padding-bottom: 10px;
         .order-th {
           background: #393D49;
           color: #fff;
@@ -123,12 +126,15 @@ export default {
         }
         .order-tr {
           border-bottom: 1px solid #e6e6e6;
+          &:last-child {
+            border-bottom: none;
+          }
         }
         .td {
           text-align: center;
           display: inline-block;
           vertical-align: middle;
-          padding: 8px 2px;
+          padding: 12px 2px;
         }
         .daifuwu {
           color: red;

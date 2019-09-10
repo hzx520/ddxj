@@ -1,7 +1,7 @@
 <template>
   <div class="feedback">
     <!-- <Table :columns="columns" :data="list"></Table> -->
-    <Scroll :on-reach-bottom="loadMore" :on-reach-top="refresh" :height="height">
+    <Scroll :on-reach-bottom="loadMore" :on-reach-top="refresh" :distance-to-edge="[10,10]" :height="height">
       <div v-if="list && list.length > 0" class="order-list">
         <div class="order-th">
           <div class="td" style="width: 38%;">订单号</div>
