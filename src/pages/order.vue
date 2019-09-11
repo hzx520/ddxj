@@ -209,23 +209,22 @@ export default {
         serviceType: this.price.serviceType,
         startTime: this.price.startTime,
         endTime: this.price.endTime,
-        cost: this.price.cost,
-        url: location.href
+        cost: this.price.cost
         // payNo: payNo
       }
       // this.$http.post(this.$baseUrl + '/api/order/save', params).then(res => {
       this.$http.post(this.$baseUrl + '/api/order/pay', params).then(res => {
         console.log(res)
-        this.$Message.success('调通接口api/order/pay');
+        // this.$Message.success('成功调通接口api/order/pay');
         // debugger
-        this.weixinPay(res.data);
+        this.queryJsToken(res.data);
       }).catch(err => {
         console.log(err)
       })
     },
-    weixinPay(data) {
+    weixinPay(data, json) {
       wx.config({
-        debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
         appId: data.appId, // 必填，公众号的唯一标识
         timestamp: data.timeStamp, // 必填，生成签名的时间戳
         nonceStr: data.nonceStr, // 必填，生成签名的随机串
@@ -233,17 +232,31 @@ export default {
         jsApiList: ['chooseWXPay'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
       });
       wx.chooseWXPay({
-        timestamp: data.timeStamp, // 支付签名时间戳，
-        nonceStr: data.nonceStr, // 支付签名随机串，不长于 32 位
-        package: data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=xxxx）
+        timestamp: json.timeStamp, // 支付签名时间戳，
+        nonceStr: json.nonceStr, // 支付签名随机串，不长于 32 位
+        package: json.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=xxxx）
         signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-        paySign: data.sign, // 支付签名
+        paySign: json.sign, // 支付签名
         success: function (res) {
             // 支付成功后的回调函数
             console.log("支付成功！");
           this.$Message.success('支付成功！');
+          this.$router.push({path: 'myOrder'})
         }
       });
+    },
+    queryJsToken(json) {
+      let params = {
+        url: location.href
+      }
+      this.$http.post(this.$baseUrl + '/api/wechat/jsToken', params).then(res => {
+        console.log(res)
+        // this.$Message.success('成功调通接口api/wechat/jsToken');
+        // debugger
+        this.weixinPay(res.data, json);
+      }).catch(err => {
+        console.log(err)
+      })
     },
     authorize() {
       let appId = 'wx1ea6607052b21894';
