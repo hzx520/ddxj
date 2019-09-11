@@ -11,8 +11,11 @@
         </div>
         <div class="order-body">
           <div class="order-tr" v-for="(item, index) in list" :key="index">
+            <div style="font-size:13px;line-height:16px;text-align:center;padding-top:10px;color:#888;">订单号：{{item.orderNo}}</div>
             <div class="td" style="width: 40%;" @click="$router.push({path: 'order', query:{orderNo: item.orderNo}})">
-              <div style="display:flex;justify-content: center;">
+              <div>{{item.startTime}}</div>
+              <div>{{item.endTime}}</div>
+              <!-- <div style="display:flex;justify-content: center;">
                 <div>
                   <Icon v-if="item.status == 0" type="ios-information-circle-outline" style="color:#ff0000;"/>
                   <Icon v-if="item.status == 1" type="ios-information-circle-outline" style="color:#FF8000;"/>
@@ -23,14 +26,18 @@
                   <div>{{item.startTime}}</div>
                   <div>{{item.endTime}}</div>
                 </div>
-              </div>
+              </div> -->
             </div>
             <div class="td" style="width: 20%;" @click="$router.push({path: 'order', query:{orderNo:item.orderNo}})">{{item.serviceName}}</div>
             <div class="td" style="width: 20%;" @click="$router.push({path: 'order', query:{orderNo:item.orderNo}})">
               <!-- <div v-if="index == 0" class="daifuwu">待服务</div>
               <div v-if="index == 1" class="fuwuzhong">服务中</div>
               <div v-if="index == 2">已过期</div> -->
-              <div>{{item.statusName}}</div>
+              <Icon v-if="item.status == 0" type="ios-information-circle-outline" style="color:#ff0000;"/>
+              <Icon v-if="item.status == 1" type="ios-information-circle-outline" style="color:#FF8000;"/>
+              <Icon v-if="item.status == 2" type="ios-radio-button-on" style="color:#76EE00;"/>
+              <Icon v-if="item.status == 3" type="ios-time-outline" style="color:#9C9C9C;"/>
+              <span>{{item.statusName}}</span>
             </div>
             <div class="td" style="width: 16%;color: blue;" @click="$router.push({path: 'feedbackDetail', query:{orderNo: item.orderNo, view:item.evaluateStatus==0?'':'1'}})">{{item.evaluateStatus == 0 ? '评价' : '查看'}}</div>
           </div>
@@ -134,7 +141,7 @@ export default {
           text-align: center;
           display: inline-block;
           vertical-align: middle;
-          padding: 12px 2px;
+          padding: 0 2px 10px 2px;
         }
         .daifuwu {
           color: red;

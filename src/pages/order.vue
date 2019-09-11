@@ -1,5 +1,10 @@
 <template>
   <div class="order" id="order">
+      <div v-if="!!orderNo">
+        <div class="name">订单号</div>
+        <div style="font-size:14px;color:#666;line-height:35px;">{{orderNo}}</div>
+        <hr>
+      </div>
       <div class="name">联系人</div>
         <i-input class="order_input" v-model="addForm.name" size="large" placeholder="请输入联系人(可选)" :readonly="!!orderNo"  style="width: 100%;"></i-input>
       <hr>
@@ -231,6 +236,7 @@ export default {
         signature: data.signature, // 必填，签名，见附录1
         jsApiList: ['chooseWXPay'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
       });
+      let that = this;
       wx.chooseWXPay({
         timestamp: json.timeStamp, // 支付签名时间戳，
         nonceStr: json.nonceStr, // 支付签名随机串，不长于 32 位
@@ -238,12 +244,21 @@ export default {
         signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
         paySign: json.sign, // 支付签名
         success: function (res) {
-            // 支付成功后的回调函数
-            console.log("支付成功！");
-          this.$Message.success('支付成功！');
-          this.$router.push({path: 'myOrder'})
+          // 支付成功后的回调函数
+          console.log("支付成功！");
+          // that.$Message.success('支付成功！');
+          that.$router.push({path: 'myOrder'});
+        },
+        cancel:function(res){
+          //支付取消
+          console.log("支付取消");
+        },
+        fail:function(res){
+          //支付失败
+          console.log("支付失败");
+          that.$router.push({path: 'myOrder'});
         }
-      });
+      })
     },
     queryJsToken(json) {
       let params = {
