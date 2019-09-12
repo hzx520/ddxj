@@ -1,7 +1,6 @@
 <template>
   <div class="feedback">
-    <!-- <Table :columns="columns" :data="list"></Table> -->
-    <Scroll :on-reach-bottom="loadMore" :on-reach-top="refresh" :distance-to-edge="[10,10]" :height="height">
+    <Scroll :on-reach-bottom="loadMore" :on-reach-top="refresh" :distance-to-edge="[20,15]" :height="height">
       <div v-if="list && list.length > 0" class="order-list">
         <div class="order-th">
           <div class="td" style="width: 38%;">订单号</div>
@@ -31,6 +30,7 @@
 <script>
 import utils from '../utils';
 import $ from 'jquery';
+import wx from 'weixin-js-sdk';
 export default {
   name: 'feedback',
   data () {
@@ -49,9 +49,29 @@ export default {
     this.queryList();
   },
   mounted(){
+    let params = {
+      url: location.href
+    }
+    this.$http.post(this.$baseUrl + '/api/wechat/jsToken', params).then(res => {
+      let data = res.data;
+      wx.config({
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: data.appId, // 必填，公众号的唯一标识
+        timestamp: data.timeStamp, // 必填，生成签名的时间戳
+        nonceStr: data.nonceStr, // 必填，生成签名的随机串
+        signature: data.signature, // 必填，签名，见附录1
+        jsApiList: ['hideMenuItems'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+      });
+      wx.ready(function() {
+        wx.hideMenuItems({// 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
+          menuList: ['menuItem:copyUrl', 'menuItem:openWithSafari', 'menuItem:openWithQQBrowser', 'menuItem:share:qq', 'menuItem:share:QZone', 'menuItem:readMode']
+        });
+      })
+    }).catch(err => {
+      console.log(err)
+    })
     let h = $('.feedback').height();
     this.height = h;
-    console.log('h' + h)
   },
   methods: {
     queryList(isRefresh) {
@@ -60,17 +80,14 @@ export default {
         pageSize: 10,
         openId: this.openid
       }
-      this.$http.post(this.$baseUrl + '/api/evaluate/queryList', params).then(res => {        
-        console.log('列表', res)
+      this.$http.post(this.$baseUrl + '/api/evaluate/queryList', params).then(res => {
         let list = res.data.list || [];
         this.total = res.data.total;
         if(isRefresh) {
           this.list = list;
-          console.log(this.list)
           return;
         }
         this.list.push(...list);
-        console.log(this.list)
         if(list && list.length < 10) {
           return;
         }
@@ -80,13 +97,11 @@ export default {
       })
     },
     loadMore() {
-      console.log('加载更多' + this.page);
       if(this.total > this.list.length) {
         this.queryList();
       }
     },
     refresh() {
-      console.log('刷新')
       this.page = 1;
       this.queryList(true);
     }

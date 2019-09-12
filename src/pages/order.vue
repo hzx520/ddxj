@@ -12,11 +12,6 @@
       <i-input class="order_input" v-model="addForm.phoneNo" size="large" @on-blur="inputBlur" placeholder="请输入联系方式(可选)" :readonly="!!orderNo" style="width: 100%;"></i-input>
       <hr>
       <div class="name">所在小区</div>
-      <!-- <i-select class="order_input" :model.sync="village" @on-change="villageChange" :label-in-value="true" size="large" placeholder="请选择所在小区" :disabled="!!orderNo">
-          <i-option v-for="(item, index) in villageList" :key="index" :value="item.villageName">{{item.villageName}}</i-option>
-          <i-option value="shanghai">上海</i-option>
-          <i-option value="hangzhou">杭州</i-option>
-      </i-select> -->
       <Select class="order_input" v-model="addForm.village" @on-change="villageChange" size="large" placeholder="请选择所在小区" :disabled="!!orderNo">
         <Option v-for="(item, index) in villageList" :key="index" :value="item.id">{{item.villageName}}</Option>
       </Select>
@@ -24,14 +19,6 @@
       <div class="name">详细地址</div>
       <i-input class="order_input" v-model="addForm.address" size="large" @on-blur="inputBlur" placeholder="请输入具体门牌号" :readonly="!!orderNo" style="width: 100%;"></i-input>
       <hr>
-      <!-- <div class="open">
-          <i-switch v-model="addForm.open" size="large" @on-change="getTime" style="width:94px;">
-              <span slot="open">￥{{price1.cost}}/{{price1.serviceName}}</span>
-              <span slot="close">￥{{price2.cost}}/{{price2.serviceName}}</span>
-          </i-switch>
-          <Icon class="huise" type="md-arrow-back" style="font-size:16px;"/>
-          <span class="huise">点击选择服务周期</span>
-      </div> -->
 
 
       <div class="name">服务方式</div>
@@ -42,17 +29,7 @@
       </div>
       
       <div class="name" style="line-height:22px;padding-bottom:10px;font-size:13px;color:#666;">预计服务周期 （{{price.startTime}} ~ {{price.endTime}}）</div>
-      <!-- <div style="padding:3px 0 0 15px;font-size:13px;line-height:15px;">具体服务周期请至：我的-个人中心-我的订单 中查看</div>
-      <div class="huise" style="padding:0 0 15px 15px;font-size:13px;">首单优惠：月付前三天免费，年付前10天免费</div> -->
       <hr>
-      <!-- <div class="tip" style="padding-top:3px;">
-          <Icon class="grey" type="md-alert"/>
-          <span class="huise">代丢服务自购买成功后次日生效</span>
-      </div>
-      <div class="tip">
-          <Icon class="grey" type="md-alert"/>
-          <span class="huise">请您早上8点前，晚上7点后将垃圾放置门口处,专业保洁人员会上门回收处理</span>
-      </div> -->
       <div style="padding-top:3px;">
         <div class="tip" v-for="(item, index) in tipList" :key="index">
             <Icon class="grey" type="md-alert"/>
@@ -61,7 +38,7 @@
       </div>
 
       <div v-if="!orderNo" class="payBtn">
-        <Button size="large" type="warning" long style="height:40px;width:90%;" @click="submitPay">支付</Button>
+        <Button size="large" type="warning" long style="height:40px;width:90%;" :disabled="!villageList || villageList.length == 0" @click="submitPay">支付</Button>
       </div>
   </div>
 </template>
@@ -114,8 +91,7 @@ export default {
         serviceType: 2,
         startTime: moment().add(1, 'days').format('YYYY-MM-DD'),
         endTime: moment().add(1, 'months').format('YYYY-MM-DD')
-      }],
-      orderNoInit: ''
+      }]
     }
   },
   created() {
@@ -134,14 +110,35 @@ export default {
         this.getOpenid();
       }
     } else {
-      // this.getTime();
       if(!this.orderNo) {
         this.getOrderInit();
       }
       this.getTips();
-      this.getCityList();
+      this.getVillageList();
     }
     this.isWXIos = this.isWeiXinAndIos();
+    
+    let params = {
+      url: location.href
+    }
+    this.$http.post(this.$baseUrl + '/api/wechat/jsToken', params).then(res => {
+      let data = res.data;
+      wx.config({
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: data.appId, // 必填，公众号的唯一标识
+        timestamp: data.timeStamp, // 必填，生成签名的时间戳
+        nonceStr: data.nonceStr, // 必填，生成签名的随机串
+        signature: data.signature, // 必填，签名，见附录1
+        jsApiList: ['hideMenuItems','chooseWXPay'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+      });
+      wx.ready(function() {
+        wx.hideMenuItems({// 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
+          menuList: ['menuItem:copyUrl', 'menuItem:openWithSafari', 'menuItem:openWithQQBrowser', 'menuItem:share:qq', 'menuItem:share:QZone', 'menuItem:readMode']
+        });
+      })
+    }).catch(err => {
+      console.log(err)
+    })
   },
   mounted() {
 
@@ -169,7 +166,6 @@ export default {
       }
       
       this.$http.post(this.$baseUrl + '/api/order/query', params).then(res => {
-        console.log(res)
         this.addForm = {
           name: res.data.data.name,
           phoneNo: res.data.data.mobile,
@@ -191,8 +187,6 @@ export default {
       })
     },
     submitPay() {
-      console.log('price',this.price)
-      console.log(this.addForm.name)
       if(!this.addForm.village) {
         this.$Message.warning('请选择小区');
         return;
@@ -206,7 +200,6 @@ export default {
       let params = {
         openId: this.openid,
         code: code,
-        // orderNo: this.orderNoInit,
         name: this.addForm.name,
         mobile: this.addForm.phoneNo,
         village: this.addForm.village,
@@ -215,27 +208,22 @@ export default {
         startTime: this.price.startTime,
         endTime: this.price.endTime,
         cost: this.price.cost
-        // payNo: payNo
       }
-      // this.$http.post(this.$baseUrl + '/api/order/save', params).then(res => {
       this.$http.post(this.$baseUrl + '/api/order/pay', params).then(res => {
-        console.log(res)
-        // this.$Message.success('成功调通接口api/order/pay');
-        // debugger
-        this.queryJsToken(res.data);
+        this.weixinPay(res.data);
       }).catch(err => {
         console.log(err)
       })
     },
-    weixinPay(data, json) {
-      wx.config({
-        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-        appId: data.appId, // 必填，公众号的唯一标识
-        timestamp: data.timeStamp, // 必填，生成签名的时间戳
-        nonceStr: data.nonceStr, // 必填，生成签名的随机串
-        signature: data.signature, // 必填，签名，见附录1
-        jsApiList: ['chooseWXPay'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
-      });
+    weixinPay(json) {
+      // wx.config({
+      //   debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+      //   appId: data.appId, // 必填，公众号的唯一标识
+      //   timestamp: data.timeStamp, // 必填，生成签名的时间戳
+      //   nonceStr: data.nonceStr, // 必填，生成签名的随机串
+      //   signature: data.signature, // 必填，签名，见附录1
+      //   jsApiList: ['chooseWXPay'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+      // });
       let that = this;
       wx.chooseWXPay({
         timestamp: json.timeStamp, // 支付签名时间戳，
@@ -261,17 +249,17 @@ export default {
       })
     },
     queryJsToken(json) {
-      let params = {
-        url: location.href
-      }
-      this.$http.post(this.$baseUrl + '/api/wechat/jsToken', params).then(res => {
-        console.log(res)
-        // this.$Message.success('成功调通接口api/wechat/jsToken');
-        // debugger
-        this.weixinPay(res.data, json);
-      }).catch(err => {
-        console.log(err)
-      })
+      // let params = {
+      //   url: location.href
+      // }
+      // this.$http.post(this.$baseUrl + '/api/wechat/jsToken', params).then(res => {
+      //   console.log(res)
+      //   // this.$Message.success('成功调通接口api/wechat/jsToken');
+      //   // debugger
+      //   this.weixinPay(res.data, json);
+      // }).catch(err => {
+      //   console.log(err)
+      // })
     },
     authorize() {
       let appId = 'wx1ea6607052b21894';
@@ -292,21 +280,16 @@ export default {
           this.code = arr[i].substr(num+1)
         }
       }
-      console.log(this.code)
       return this.code;
     },
     getOpenid() {
       this.$http.post(this.$baseUrl + '/api/wechat/getOpenId', {code: this.code}).then(res => {
         this.openid = res.data.openId;
-        console.log(res)
-        console.log(this.openid)
-        // this.getTime();
         this.getTips();
         this.getOrderInit();
-        this.getCityList();
+        this.getVillageList();
         utils.dbSet('openid', this.openid);
         utils.dbSet('code', this.code);
-        // debugger
       }).catch(err => {
         console.log(err)
       })
@@ -320,7 +303,6 @@ export default {
     },
     getOrderInit() {
       this.$http.post(this.$baseUrl + '/api/order/init', {openId: this.openid}).then(response => {
-        console.log(response)
         let res = response.data;
         this.addForm = {
           name: res.data.name,
@@ -329,7 +311,6 @@ export default {
           address: res.data.addr
         }
         this.getVillageService();
-        this.orderNoInit = res.data.orderNo;
       }).catch(err => {
         console.log(err)
       })
@@ -345,7 +326,7 @@ export default {
         }
       })
     },
-    getCityList() {
+    getVillageList() {
       this.$http.post(this.$baseUrl + '/api/village/queryList', {pageNo: 1,pageSize: 9999,openId: this.openid}).then(res => {
         this.villageList = res.data.list || [];
         this.getVillageService();
@@ -354,7 +335,6 @@ export default {
       })
     },
     villageChange() {
-      console.log(this.addForm.village)
       let obj = this.villageList.find(item => {
         return item.id == this.addForm.village;
       }) || {}
@@ -371,9 +351,6 @@ export default {
       this.priceIndex = index;
       this.price = this.priceList[index];
     },
-    getTime() {
-      
-    }
   },
 }
 </script>
@@ -433,11 +410,14 @@ export default {
          padding-top: 10px;
       }
       .huise {
-         color: #d2d2d2;
+         color: #999;
          line-height: 25px;
       }
+      .tip {
+        line-height: 18px;
+      }
       .tip .huise {
-        line-height: 20px;
+        line-height: 18px;
         font-size: 13px;
       }
       .mt10 {

@@ -1,7 +1,6 @@
 <template>
   <div class="my">
     <div class="wx-head" @click="modal = true;">
-      <!-- <img src="../assets/touxiang.svg" class="wx-head-pic"> -->
       <img :src="info.headimgurl || '../assets/touxiang.svg'" class="wx-head-pic">
       <span class="wx-name">{{info.nickname}}</span>
       <img src="../assets/erweima.svg" class="wx-erweima-pic">
@@ -39,6 +38,7 @@
 
 <script>
 import utils from '../utils';
+import wx from 'weixin-js-sdk';
 export default {
   name: 'my',
   data () {
@@ -65,12 +65,34 @@ export default {
         }
       }
     this.getQRCode();
-
+    
+  },
+  mounted() {
+    let params = {
+      url: location.href
+    }
+    this.$http.post(this.$baseUrl + '/api/wechat/jsToken', params).then(res => {
+      let data = res.data;
+      wx.config({
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: data.appId, // 必填，公众号的唯一标识
+        timestamp: data.timeStamp, // 必填，生成签名的时间戳
+        nonceStr: data.nonceStr, // 必填，生成签名的随机串
+        signature: data.signature, // 必填，签名，见附录1
+        jsApiList: ['hideMenuItems'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+      });
+      wx.ready(function() {
+        wx.hideMenuItems({// 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
+          menuList: ['menuItem:copyUrl', 'menuItem:openWithSafari', 'menuItem:openWithQQBrowser', 'menuItem:share:qq', 'menuItem:share:QZone', 'menuItem:readMode']
+        });
+      })
+    }).catch(err => {
+      console.log(err)
+    })
   },
   methods: {
     getUserInfo(openid) {
         this.$http.post(this.$baseUrl + '/api/wechat/getUserInfo', {openId: openid}).then(res => {
-          console.log('xinxi',res)
           this.info = res.data;
         }).catch(err => {
           console.log(err)
@@ -78,7 +100,6 @@ export default {
     },
     getQRCode() {
       this.$http.post(this.$baseUrl + '/api/wechat/getQRCode', {}).then(res => {
-        console.log(res)
         this.qrCodeUrl = res.data.qrcodeUrl;
       }).catch(err => {
         console.log(err)
@@ -103,7 +124,6 @@ export default {
           this.code = arr[i].substr(num+1)
         }
       }
-      console.log(this.code)
       return this.code;
     },
     getOpenid() {
@@ -119,7 +139,6 @@ export default {
     clearOpenid() {
       utils.dbRemove('openid');      
       this.$Message.success('已清除');
-      // this.$router.push({path:'my'});
       window.reload();
     }
   }
