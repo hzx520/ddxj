@@ -108,7 +108,6 @@ export default {
     authorize() {
       let appId = 'wx1ea6607052b21894';
       let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2fmy';
-      // let redirect = 'http%3a%2f%2fwww.cx-tech.co%3a8010%2f%23%2fme';
       let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
       window.location.replace(url);
     },

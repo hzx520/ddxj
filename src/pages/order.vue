@@ -6,10 +6,10 @@
         <hr>
       </div>
       <div class="name">联系人</div>
-        <i-input class="order_input" v-model="addForm.name" size="large" placeholder="请输入联系人(可选)" :readonly="!!orderNo"  style="width: 100%;"></i-input>
+        <i-input class="order_input" v-model="addForm.name" size="large" placeholder="请输入联系人" :readonly="!!orderNo"  style="width: 100%;"></i-input>
       <hr>
       <div class="name">联系方式</div>
-      <i-input class="order_input" v-model="addForm.phoneNo" size="large" @on-blur="inputBlur" placeholder="请输入联系方式(可选)" :readonly="!!orderNo" style="width: 100%;"></i-input>
+      <i-input class="order_input" v-model="addForm.mobile" size="large" @on-blur="inputBlur" placeholder="请输入联系方式" :readonly="!!orderNo" style="width: 100%;"></i-input>
       <hr>
       <div class="name">所在小区</div>
       <Select class="order_input" v-model="addForm.village" @on-change="villageChange" size="large" placeholder="请选择所在小区" :disabled="!!orderNo">
@@ -17,7 +17,7 @@
       </Select>
       <hr>
       <div class="name">详细地址</div>
-      <i-input class="order_input" v-model="addForm.address" size="large" @on-blur="inputBlur" placeholder="请输入具体门牌号" :readonly="!!orderNo" style="width: 100%;"></i-input>
+      <i-input class="order_input" v-model="addForm.addr" size="large" @on-blur="inputBlur" placeholder="请输入具体门牌号" :readonly="!!orderNo" style="width: 100%;"></i-input>
       <hr>
 
 
@@ -55,9 +55,9 @@ export default {
       orderNo: '',
       addForm: {
         name: '',
-        phoneNo: '',
+        mobile: '',
         village: '',
-        address: '',
+        addr: '',
       },
       open: true,
       isWXIos: false,
@@ -86,7 +86,7 @@ export default {
         startTime: moment().add(1, 'days').format('YYYY-MM-DD'),
         endTime: moment().add(6, 'months').format('YYYY-MM-DD')
       },{
-        cost: 480,
+        cost: 499,
         serviceName: '年度',
         serviceType: 2,
         startTime: moment().add(1, 'days').format('YYYY-MM-DD'),
@@ -168,9 +168,9 @@ export default {
       this.$http.post(this.$baseUrl + '/api/order/query', params).then(res => {
         this.addForm = {
           name: res.data.data.name,
-          phoneNo: res.data.data.mobile,
+          mobile: res.data.data.mobile,
           village: res.data.data.village,
-          address: res.data.data.addr
+          addr: res.data.data.addr
         }
         this.price = {
           startTime: res.data.data.startTime,
@@ -187,11 +187,19 @@ export default {
       })
     },
     submitPay() {
+      if(!this.addForm.name) {
+        this.$Message.warning('请输入联系人');
+        return;
+      }
+      if(!this.addForm.mobile) {
+        this.$Message.warning('请输入联系方式');
+        return;
+      }
       if(!this.addForm.village) {
         this.$Message.warning('请选择小区');
         return;
       }
-      if(!this.addForm.address) {
+      if(!this.addForm.addr) {
         this.$Message.warning('请输入地址');
         return;
       }
@@ -201,9 +209,9 @@ export default {
         openId: this.openid,
         code: code,
         name: this.addForm.name,
-        mobile: this.addForm.phoneNo,
+        mobile: this.addForm.mobile,
         village: this.addForm.village,
-        addr: this.addForm.address,
+        addr: this.addForm.addr,
         serviceType: this.price.serviceType,
         startTime: this.price.startTime,
         endTime: this.price.endTime,
@@ -264,7 +272,6 @@ export default {
     authorize() {
       let appId = 'wx1ea6607052b21894';
       let redirect = 'http%3a%2f%2fwww.cx-tech.co%2f%23%2forder';
-      // let redirect = 'http%3a%2f%2fwww.cx-tech.co%3a8010%2f%23%2forder1';
       let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirect}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect`;
       window.location.replace(url);
     },
@@ -306,9 +313,9 @@ export default {
         let res = response.data;
         this.addForm = {
           name: res.data.name,
-          phoneNo: res.data.mobile,
+          mobile: res.data.mobile,
           village: res.data.village,
-          address: res.data.addr
+          addr: res.data.addr
         }
         this.getVillageService();
       }).catch(err => {
