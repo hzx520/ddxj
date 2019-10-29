@@ -11,7 +11,6 @@
       <router-link to="/feedback">反馈列表</router-link>
     </div>
   </div>
-  
 </template>
 
 <script>
