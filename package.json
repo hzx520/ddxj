@@ -15,7 +15,7 @@
   "dependencies": {
     "iview": "^3.4.2",
     "jquery": "^3.4.1",
-    "node-sass": "^4.12.0",
+    "node-sass": "^7.0.0",
     "save": "^2.4.0",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
